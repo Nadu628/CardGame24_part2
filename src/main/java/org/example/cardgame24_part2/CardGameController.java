@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Card Game Controller for Card Game 24
+ *
+ */
+
 public class CardGameController {
     @FXML
     private ImageView card1ImageView, card2ImageView, card3ImageView, card4ImageView;
@@ -24,6 +29,10 @@ public class CardGameController {
     private List<String> deck; //hold card file names
     private List<Integer> currentCardValues; //sore numeric value of cards
 
+    /**
+     * Initialize method. initializes the game by setting up deck, shiffling the cards and assigning the cards values
+     *
+     */
     @FXML
     public void initialize() {
         deck = new ArrayList<>();
@@ -49,7 +58,11 @@ public class CardGameController {
 
     }//end initial method
 
+    /**
+     * refreshCards() method,shuffles deck and updates the displayed cards
+     */
     private void refreshCards() {
+        //shuffle deck
         Collections.shuffle(deck);
         currentCardValues = new ArrayList<>();
 
@@ -71,6 +84,11 @@ public class CardGameController {
 
     }//end refresh cards method
 
+    /**
+     * updates imageviews with specified images
+     * @param cardImageView imageView to be updated
+     * @param cardFileName file name for card images
+     */
     private void updateCard(ImageView cardImageView, String cardFileName) {
         InputStream stream = CardGameController.class.getResourceAsStream("/cardImages/" + cardFileName);
 
@@ -79,8 +97,13 @@ public class CardGameController {
         }
         Image cardImage = new Image(stream);
         cardImageView.setImage(cardImage);
-    }
+    } //updateCards() end
 
+    /**
+     * gets numeric value of cards based on file name
+     * @param cardFileName file name of card
+     * @return numeric value of card
+     */
     private int getCardValue(String cardFileName) {
         String cardname = cardFileName.split("_of_")[0];
         switch (cardname){
@@ -92,14 +115,19 @@ public class CardGameController {
         }
     }
 
+    /**
+     * verifies if user inputef an expression that evaluates to 24
+     */
     private void verifyExpression(){
         String expression = expressionTextField.getText();
 
+        //check expression contains all card values displayed
         if(!expressionContainsAll(expression)){
             showAlert("Invalid Input, expression must use all four cards");
             return;
         }
 
+        //evaluate user expression
         try{
             double result = evaluateExpression(expression);
             if(Math.abs(result-24) < 0.0001){
@@ -112,6 +140,10 @@ public class CardGameController {
         }
     }
 
+    /**
+     * displays message to user in alert box
+     * @param s message to be displayed
+     */
     private void showAlert(String s) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Message");
@@ -120,6 +152,11 @@ public class CardGameController {
         alert.showAndWait();
     }
 
+    /**
+     * checks expression contains all card values
+     * @param expression users expression
+     * @return true if all card values are used, false otherwise
+     */
     private boolean expressionContainsAll(String expression){
         for(int value: currentCardValues){
             if(!expression.contains(String.valueOf(value))){
@@ -130,12 +167,24 @@ public class CardGameController {
         return true;
     }
 
+    /**
+     * evaluates the expression
+     * @param expression expression to be evaluated
+     * @return result of evaluation
+     * @throws Exception if the expression is invalid
+     */
     private double evaluateExpression(String expression) throws Exception{
         expression = expression.replaceAll("\\s+", "");
         List<String> tokens = tokenizeExpression(expression);
         return evaluateTokens(tokens);
     }
 
+    /**
+     * tokenize the given expression into a list of numbers and operators
+     * @param expression expression to be tokenized
+     * @return list of tokens
+     * @throws Exception if expression contains invalid characters
+     */
     private List<String> tokenizeExpression(String expression) throws Exception{
         List<String> tokens = new ArrayList<>();
         String number = "";
@@ -160,6 +209,13 @@ public class CardGameController {
         return tokens;
     }
 
+    /**
+     * evaluated list of tokens to compute the result
+     *
+     * @param tokens list of tokens to evaluate
+     * @return evaluation
+     * @throws Exception if expression is invalid
+     */
     private double evaluateTokens(List<String> tokens) throws Exception{
         while (tokens.contains("(")) {
             int openIndex = tokens.lastIndexOf("(");
@@ -210,6 +266,9 @@ public class CardGameController {
             return Double.parseDouble(tokens.get(0));
     }
 
+    /**
+     * find valid expression that evaluates to 24 and displays in appropriate text field
+     */
     private void findSolution() {
         // Fixed card values in the displayed order
         int a = currentCardValues.get(0);
