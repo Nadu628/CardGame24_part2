@@ -45,7 +45,7 @@ public class CardGameController {
         verifyButton.setOnAction(e -> verifyExpression());
 
         //find solution button
-        //findSolutionButton.setOnAction(e -> showAlert());
+        findSolutionButton.setOnAction(e -> findSolution());
 
     }//end initial method
 
@@ -209,5 +209,50 @@ public class CardGameController {
             }
             return Double.parseDouble(tokens.get(0));
     }
+
+    private void findSolution() {
+        // Fixed card values in the displayed order
+        int a = currentCardValues.get(0);
+        int b = currentCardValues.get(1);
+        int c = currentCardValues.get(2);
+        int d = currentCardValues.get(3);
+
+        // All possible operators
+        String[] operators = {"+", "-", "*", "/"};
+
+        // Test all combinations of operators and parentheses
+        for (String op1 : operators) {
+            for (String op2 : operators) {
+                for (String op3 : operators) {
+                    // Different groupings of parentheses
+                    String[] expressions = {
+                            a + op1 + b + op2 + c + op3 + d,
+                            "(" + a + op1 + b + ")" + op2 + c + op3 + d,
+                            "(" + a + op1 + b + op2 + c + ")" + op3 + d,
+                            "(" + a + op1 + "(" + b + op2 + c + "))" + op3 + d,
+                            "(" + "(" + a + op1 + b + ")" + op2 + c + ")" + op3 + d
+                    };
+
+                    // Evaluate each expression
+                    for (String expression : expressions) {
+                        try {
+                            double result = evaluateExpression(expression); // Use your existing evaluate method
+                            if (Math.abs(result - 24) < 0.0001) {
+                                // Display the solution in the result field
+                                solutionTextField.setText(expression);
+                                return; // Stop once a solution is found
+                            }
+                        } catch (Exception ignored) {
+                            // Ignore invalid expressions (e.g., division by zero)
+                        }
+                    }
+                }
+            }
+        }
+
+        // If no solution is found, display a message
+        solutionTextField.setText("No solution found.");
+    }
+
 
 }
